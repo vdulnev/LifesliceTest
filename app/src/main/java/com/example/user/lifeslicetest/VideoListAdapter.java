@@ -2,12 +2,15 @@ package com.example.user.lifeslicetest;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -29,6 +32,7 @@ public class VideoListAdapter extends ArrayAdapter<Record> {
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.d("lifeslicetest", "getView: " + position);
         View v;
         if (convertView == null) {
             LayoutInflater l = (LayoutInflater)getContext().getSystemService
@@ -38,6 +42,7 @@ public class VideoListAdapter extends ArrayAdapter<Record> {
             h.avatar = (ImageView) v.findViewById(R.id.avatar);
             h.userName = (TextView) v.findViewById(R.id.userName);
             h.thumbNail = (ImageView) v.findViewById(R.id.thumbnail);
+            h.progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
             v.setTag(h);
         } else {
             v = convertView;
@@ -47,6 +52,8 @@ public class VideoListAdapter extends ArrayAdapter<Record> {
         return v;
     }
 
+
+
     public int getSelectedItem() {
         return selectedItem;
     }
@@ -55,10 +62,11 @@ public class VideoListAdapter extends ArrayAdapter<Record> {
         this.selectedItem = selectedItem;
     }
 
-    private class Holder {
+    public class Holder {
         ImageView avatar;
         TextView userName;
         ImageView thumbNail;
+        ProgressBar progressBar;
 
         void setData(int position) {
             Record r = getItem(position);
@@ -67,8 +75,10 @@ public class VideoListAdapter extends ArrayAdapter<Record> {
                 userName.setText(r.getUsername());
                 if (position == selectedItem) {
                     userName.setTextColor(Color.BLUE);
+                    progressBar.setVisibility(View.VISIBLE);
                 } else {
                     userName.setTextColor(Color.BLACK);
+                    progressBar.setVisibility(View.GONE);
                 }
                 Picasso.with(getContext()).load(r.getThumbnailUrl()).into(thumbNail);
             }

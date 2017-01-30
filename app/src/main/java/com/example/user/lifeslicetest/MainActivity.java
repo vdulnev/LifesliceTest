@@ -1,6 +1,8 @@
 package com.example.user.lifeslicetest;
 
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -17,7 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,6 +167,8 @@ public class MainActivity extends AppCompatActivity {
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
         private MainActivity parent;
+        private VideoView vv;
+        private ListView l;
 
         public SecondFragment() {
         }
@@ -171,17 +177,54 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_second, container, false);
-            ListView l = (ListView) rootView.findViewById(R.id.listView);
+            vv = (VideoView) rootView.findViewById(R.id.videoView);
+            vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    int pos = parent.adapter.getSelectedItem();
+                    if (pos > -1)
+                        if (pos < parent.adapter.getCount() - 1) {
+                            startVideo(pos + 1);
+                        } else {
+                            stopVideo();
+                        }
+                }
+            });
+            l = (ListView) rootView.findViewById(R.id.listView);
             parent = (MainActivity) getActivity();
             l.setAdapter(parent.adapter);
             l.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    parent.adapter.setSelectedItem(i);
-                    parent.adapter.notifyDataSetChanged();
+                    if (!vv.isPlaying()) {
+                        startVideo(i);
+                    } else {
+                        stopVideo();
+                    }
                 }
             });
             return rootView;
+        }
+
+        private void stopVideo() {
+            setPosition(-1);
+            vv.stopPlayback();
+        }
+
+        private void startVideo(int pos) {
+            setPosition(pos);
+            Record r = parent.records.get(pos);
+            vv.setVideoURI(Uri.parse(r.getVideoUrl()));
+            vv.start();
+        }
+
+        private void setPosition(int pos) {
+            parent.adapter.setSelectedItem(pos);
+            if (pos > -1) {
+                l.smoothScrollToPosition(pos);
+            }
+            parent.adapter.notifyDataSetChanged();
+            Log.d("lifeslicetest", "notifyDataSetChanged");
         }
     }
 
