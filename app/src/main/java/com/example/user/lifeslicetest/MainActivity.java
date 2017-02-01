@@ -78,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
                 switch (position) {
                     case 0:
                         stopLoading = true;
+                        if (secondFragment != null) {
+                            secondFragment.stopVideo();
+                        }
                         break;
                     case 1:
                         stopLoading = false;
@@ -285,6 +288,8 @@ public class MainActivity extends AppCompatActivity {
         private void stopVideo() {
             setPosition(-1);
             vv.stopPlayback();
+            vv.setVisibility(View.GONE);
+            vv.setVisibility(View.VISIBLE);
         }
 
         private void startVideo(int pos) {
