@@ -209,7 +209,12 @@ public class MainActivity extends AppCompatActivity {
                     if (!vv.isPlaying()) {
                         startVideo(i);
                     } else {
-                        stopVideo();
+                        if (adapter.getSelectedItem() != i) {
+                            stopVideo();
+                            startVideo(i);
+                        } else {
+                            stopVideo();
+                        }
                     }
                 }
             });
