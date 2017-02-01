@@ -1,26 +1,26 @@
 package com.example.user.lifeslicetest;
 
-import android.graphics.Color;
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.VideoView;
 
 import java.util.ArrayList;
@@ -47,20 +47,19 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private VinoIntf srv;
-    private List<Record> records = new ArrayList<>();
-    private VideoListAdapter adapter;
+    private String tag;
+    private FirstFragment firstFragment;
+    private SecondFragment secondFragment;
+    private boolean stopLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        srv = new VinoImpl().getService();
-        adapter = new VideoListAdapter(this, -1, records);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //toolbar.setNavigationM
         // Create the adapter that will return adapter fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -68,7 +67,36 @@ public class MainActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        stopLoading = true;
+                        break;
+                    case 1:
+                        stopLoading = false;
+                        if (secondFragment != null) {
+                            InputMethodManager imm = (InputMethodManager)
+                                    getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(mViewPager.getWindowToken(), 0);
+                            tag = firstFragment.et.getText().toString();
+                            secondFragment.loadRecords(tag, 0);
+                        }
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
 
@@ -94,51 +122,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        records.clear();
-        loadRecords(0);
-    }
-
-    private void loadRecords(final int page) {
-        Callback<com.example.user.lifeslicetest.Response> callback = new Callback<com.example.user.lifeslicetest.Response>() {
-            @Override
-            public void onResponse(Call<com.example.user.lifeslicetest.Response> call, Response<com.example.user.lifeslicetest.Response> response) {
-                com.example.user.lifeslicetest.Response resp = response.body();
-                Records data = resp.getData();
-                if (data != null) {
-                    Log.d(TAG, "Got records: " + data.getSize());
-                    Log.d(TAG, "Overall count: " + data.getCount());
-                    Log.d(TAG, "Next page: " + data.getNextPage());
-                    Record[] dataRecords = data.getRecords();
-                    if (dataRecords != null) {
-                        for (Record r : dataRecords) {
-                            records.add(r);
-                            adapter.notifyDataSetChanged();
-                        }
-                        Log.d(TAG, "Added records: " + dataRecords.length);
-                        Log.d(TAG, "Overall number of records: " + records.size());
-                    }
-                    int nextPage = page + 1;
-                    if (data.getNextPage() != null) loadRecords(nextPage);
-                } else {
-                    Log.d(TAG, "No records received");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<com.example.user.lifeslicetest.Response> call, Throwable t) {
-                Log.e(TAG, "Load videos failed.");
-            }
-        };
-        getData(page, callback);
-    }
-
-    private void getData(int page, Callback<com.example.user.lifeslicetest.Response> callback) {
-        srv.get(page).enqueue(callback);
-    }
-
     /**
      * A placeholder fragment containing adapter simple view.
      */
@@ -148,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private EditText et;
 
         public FirstFragment() {
         }
@@ -155,7 +139,28 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_first, container, false);
+            final View rootView = inflater.inflate(R.layout.fragment_first, container, false);
+            final MainActivity parent = (MainActivity) getActivity();
+            et = (EditText) rootView.findViewById(R.id.editText);
+            et.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    if (!b) {
+                        parent.tag = et.getText().toString();
+                        Log.d(TAG, "Focus lost, new tag: " + parent.tag);
+                    } else {
+                        Log.d(TAG, "Focus got");
+                    }
+                }
+            });
+            parent.tag = et.getText().toString();
+            Button b = (Button) rootView.findViewById(R.id.button);
+            b.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    parent.mViewPager.setCurrentItem(1);
+                }
+            });
             return rootView;
         }
     }
@@ -166,7 +171,10 @@ public class MainActivity extends AppCompatActivity {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private List<Record> records = new ArrayList<>();
         private MainActivity parent;
+        private VinoIntf srv;
+        private VideoListAdapter adapter;
         private VideoView vv;
         private ListView l;
 
@@ -181,9 +189,9 @@ public class MainActivity extends AppCompatActivity {
             vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
-                    int pos = parent.adapter.getSelectedItem();
+                    int pos = adapter.getSelectedItem();
                     if (pos > -1)
-                        if (pos < parent.adapter.getCount() - 1) {
+                        if (pos < adapter.getCount() - 1) {
                             startVideo(pos + 1);
                         } else {
                             stopVideo();
@@ -192,7 +200,9 @@ public class MainActivity extends AppCompatActivity {
             });
             l = (ListView) rootView.findViewById(R.id.listView);
             parent = (MainActivity) getActivity();
-            l.setAdapter(parent.adapter);
+            srv = new VinoImpl().getService();
+            adapter = new VideoListAdapter(getActivity(), -1, records);
+            l.setAdapter(adapter);
             l.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -206,6 +216,67 @@ public class MainActivity extends AppCompatActivity {
             return rootView;
         }
 
+        private void loadRecords(final String tag, final int page) {
+            if (tag != null && tag.trim().length() > 0) {
+                if (!parent.stopLoading) {
+                    if (page == 0) records.clear();
+                    Callback<com.example.user.lifeslicetest.Response> callback = new Callback<com.example.user.lifeslicetest.Response>() {
+                        @Override
+                        public void onResponse(Call<com.example.user.lifeslicetest.Response> call, Response<com.example.user.lifeslicetest.Response> response) {
+                            com.example.user.lifeslicetest.Response resp = response.body();
+                            Records data = resp.getData();
+                            int n = 0;
+                            if (data != null) {
+                                Log.d(TAG, "Got records: " + data.getSize());
+                                Log.d(TAG, "Overall count: " + data.getCount());
+                                Log.d(TAG, "Next page: " + data.getNextPage());
+                                Record[] dataRecords = data.getRecords();
+                                if (dataRecords != null) {
+                                    for (Record r : dataRecords) {
+                                        if (addRecord(r)) {
+                                            adapter.notifyDataSetChanged();
+                                            n++;
+                                        }
+                                    }
+                                    Log.d(TAG, "Added records: " + n);
+                                    Log.d(TAG, "Overall number of records: " + records.size());
+                                }
+                                int nextPage = page + 1;
+                                if (data.getNextPage() != null) loadRecords(tag, nextPage);
+                            } else {
+                                Log.d(TAG, "No records received");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<com.example.user.lifeslicetest.Response> call, Throwable t) {
+                            Log.e(TAG, "Load videos failed: " + t.getLocalizedMessage());
+                        }
+                    };
+                    getForTag(tag, page, callback);
+                } else {
+                    Log.d(TAG, "Load videos stopped");
+                }
+            } else {
+                Log.e(TAG, "Load data failed: tag is empty");
+            }
+        }
+
+        private boolean addRecord(Record r) {
+            for (Record r1 : records) {
+                if (r1.getVideoUrl() != null && r1.getVideoUrl().equals(r.getVideoUrl())) {
+                    Log.e(TAG, "found duplicate record: " + r.getVideoUrl());
+                    return false;
+                }
+            }
+            records.add(r);
+            return true;
+        }
+
+        private void getForTag(String tag, int page, Callback<com.example.user.lifeslicetest.Response> callback) {
+            srv.getForTag(tag, page).enqueue(callback);
+        }
+
         private void stopVideo() {
             setPosition(-1);
             vv.stopPlayback();
@@ -213,17 +284,17 @@ public class MainActivity extends AppCompatActivity {
 
         private void startVideo(int pos) {
             setPosition(pos);
-            Record r = parent.records.get(pos);
+            Record r = records.get(pos);
             vv.setVideoURI(Uri.parse(r.getVideoUrl()));
             vv.start();
         }
 
         private void setPosition(int pos) {
-            parent.adapter.setSelectedItem(pos);
+            adapter.setSelectedItem(pos);
             if (pos > -1) {
                 l.smoothScrollToPosition(pos);
             }
-            parent.adapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
             Log.d("lifeslicetest", "notifyDataSetChanged");
         }
     }
@@ -242,9 +313,11 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new FirstFragment();
+                    firstFragment = new FirstFragment();
+                    return firstFragment;
                 case 1:
-                    return new SecondFragment();
+                    secondFragment = new SecondFragment();
+                    return secondFragment;
                 default:
                     return null;
             }
@@ -260,9 +333,9 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "A";
                 case 1:
-                    return "SECTION 2";
+                    return "B";
             }
             return null;
         }

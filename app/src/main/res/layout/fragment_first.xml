@@ -6,30 +6,32 @@
     tools:context="com.example.user.lifeslicetest.MainActivity$FirstFragment">
 
     <EditText
+        android:id="@+id/editText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="Name"
-        android:ems="10"
-        android:id="@+id/editText"
-        tools:layout_constraintRight_creator="1"
         android:layout_marginEnd="16dp"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="16dp"
+        android:ems="10"
+        android:imeActionLabel="Next"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        android:text="cat"
         app:layout_constraintBaseline_toBaselineOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         tools:layout_constraintBaseline_creator="1"
-        android:layout_marginRight="16dp" />
+        tools:layout_constraintRight_creator="1" />
 
     <Button
+        android:id="@+id/button"
         android:layout_width="100dp"
         android:layout_height="48dp"
-        android:id="@+id/button"
-        android:background="@drawable/ic_arrow_forward_black_24px"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintRight_toRightOf="parent"
         android:layout_marginBottom="72dp"
-        android:layout_marginRight="16dp" />
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/ic_arrow_forward_black_24px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintRight_creator="1" />
 
 </android.support.constraint.ConstraintLayout>

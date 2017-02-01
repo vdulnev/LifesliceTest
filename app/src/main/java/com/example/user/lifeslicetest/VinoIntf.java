@@ -13,6 +13,6 @@ public interface VinoIntf {
 
     public static final String SERVER_URL = "https://api.vineapp.com/";
 
-    @GET("timelines/tags/cat")
-    Call<Response>get(@Query("page") int page);
+    @GET("timelines/tags/{tag}")
+    Call<Response> getForTag(@Path("tag") String tag, @Query("page") int page);
 }
