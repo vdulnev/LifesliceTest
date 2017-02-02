@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.util.ArrayList;
@@ -232,27 +233,35 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<com.example.user.lifeslicetest.Response> call, Response<com.example.user.lifeslicetest.Response> response) {
                             com.example.user.lifeslicetest.Response resp = response.body();
-                            Records data = resp.getData();
-                            int n = 0;
-                            if (data != null) {
-                                Log.d(TAG, "Got records: " + data.getSize());
-                                Log.d(TAG, "Overall count: " + data.getCount());
-                                Log.d(TAG, "Next page: " + data.getNextPage());
-                                Record[] dataRecords = data.getRecords();
-                                if (dataRecords != null) {
-                                    for (Record r : dataRecords) {
-                                        if (addRecord(r)) {
-                                            adapter.notifyDataSetChanged();
-                                            n++;
+                            if (resp != null) {
+                                Records data = resp.getData();
+                                int n = 0;
+                                if (data != null) {
+                                    Log.d(TAG, "Got records: " + data.getSize());
+                                    Log.d(TAG, "Overall count: " + data.getCount());
+                                    Log.d(TAG, "Next page: " + data.getNextPage());
+                                    Record[] dataRecords = data.getRecords();
+                                    if (dataRecords != null) {
+                                        for (Record r : dataRecords) {
+                                            if (addRecord(r)) {
+                                                adapter.notifyDataSetChanged();
+                                                n++;
+                                            }
                                         }
+                                        Log.d(TAG, "Added records: " + n);
+                                        Log.d(TAG, "Overall number of records: " + records.size());
                                     }
-                                    Log.d(TAG, "Added records: " + n);
-                                    Log.d(TAG, "Overall number of records: " + records.size());
+                                    int nextPage = page + 1;
+                                    if (data.getNextPage() != null) loadRecords(tag, nextPage);
+                                } else {
+                                    Log.d(TAG, "No records received");
                                 }
-                                int nextPage = page + 1;
-                                if (data.getNextPage() != null) loadRecords(tag, nextPage);
                             } else {
-                                Log.d(TAG, "No records received");
+                                String msg = "No data received !";
+                                Log.e(TAG, msg);
+                                if (parent != null) {
+                                    Toast.makeText(parent, msg, Toast.LENGTH_LONG).show();
+                                }
                             }
                         }
 
