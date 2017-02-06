@@ -24,6 +24,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -174,7 +176,255 @@ public class MainActivity extends AppCompatActivity {
          * The fragment argument representing the section number for this
          * fragment.
          */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+        public static final String FAKE_JSON = "{\n" +
+                "\t\"count\": 5,\n" +
+                "\t\"records\": [{\n" +
+                "\t\t\"avatarUrl\": \"http://vines.s3.amazonaws.com/avatars/FC220C82-1370-4340-887C-01254FBAFB7D-4274-000002E4D4C0B0D4.jpg\",\n" +
+                "\t\t\"comments\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/D6360E08-0BF5-4750-A883-9F9F09F91E06-25016-0000191A7355BDF7.jpg\",\n" +
+                "\t\t\t\t\"comment\": \"When pizza's on a bagel you can eat pizza anytime!\",\n" +
+                "\t\t\t\t\"commentId\": 898291497017937920,\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:19:56.000000\",\n" +
+                "\t\t\t\t\"location\": \"Brooklyn, NY\",\n" +
+                "\t\t\t\t\"userId\": 110,\n" +
+                "\t\t\t\t\"username\": \"Kristian Bauer\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"created\": \"2013-01-02T16:12:23.000000\",\n" +
+                "\t\t\"description\": \"Pizza??? For breakfast?!?!\",\n" +
+                "\t\t\"foursquareVenueId\": null,\n" +
+                "\t\t\"latitude\": 40.70322799682617,\n" +
+                "\t\t\"liked\": false,\n" +
+                "\t\t\"likes\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/1194B685-5366-40A9-B36A-A3403AA35716-2999-000000D804A9A9AA.jpg\",\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:26:28.000000\",\n" +
+                "\t\t\t\t\"likeId\": 898293141113806848,\n" +
+                "\t\t\t\t\"location\": \"NYC\",\n" +
+                "\t\t\t\t\"userId\": 5,\n" +
+                "\t\t\t\t\"username\": \"Dom Hofmann\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"location\": \"NY USA\",\n" +
+                "\t\t\"longitude\": -73.94598388671875,\n" +
+                "\t\t\"postId\": 898289598352990208,\n" +
+                "\t\t\"postToFacebook\": 0,\n" +
+                "\t\t\"postToTwitter\": 0,\n" +
+                "\t\t\"promoted\": 0,\n" +
+                "\t\t\"tags\": null,\n" +
+                "\t\t\"thumbnailUrl\": \"http://vines.s3.amazonaws.com/thumbs/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4.jpg\",\n" +
+                "\t\t\"userId\": 108,\n" +
+                "\t\t\"username\": \"Bobby McKenna\",\n" +
+                "\t\t\"videoLowURL\": null,\n" +
+                "\t\t\"videoUrl\": \"http://vines.s3.amazonaws.com/videos/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4\"\n" +
+                "\t}, \n" +
+                "\t{\n" +
+                "\t\t\"avatarUrl\": \"http://vines.s3.amazonaws.com/avatars/FC220C82-1370-4340-887C-01254FBAFB7D-4274-000002E4D4C0B0D4.jpg\",\n" +
+                "\t\t\"comments\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/D6360E08-0BF5-4750-A883-9F9F09F91E06-25016-0000191A7355BDF7.jpg\",\n" +
+                "\t\t\t\t\"comment\": \"When pizza's on a bagel you can eat pizza anytime!\",\n" +
+                "\t\t\t\t\"commentId\": 898291497017937920,\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:19:56.000000\",\n" +
+                "\t\t\t\t\"location\": \"Brooklyn, NY\",\n" +
+                "\t\t\t\t\"userId\": 110,\n" +
+                "\t\t\t\t\"username\": \"Kristian Bauer\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"created\": \"2013-01-02T16:12:23.000000\",\n" +
+                "\t\t\"description\": \"Pizza??? For breakfast?!?!\",\n" +
+                "\t\t\"foursquareVenueId\": null,\n" +
+                "\t\t\"latitude\": 40.70322799682617,\n" +
+                "\t\t\"liked\": false,\n" +
+                "\t\t\"likes\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/1194B685-5366-40A9-B36A-A3403AA35716-2999-000000D804A9A9AA.jpg\",\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:26:28.000000\",\n" +
+                "\t\t\t\t\"likeId\": 898293141113806848,\n" +
+                "\t\t\t\t\"location\": \"NYC\",\n" +
+                "\t\t\t\t\"userId\": 5,\n" +
+                "\t\t\t\t\"username\": \"Dom Hofmann\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"location\": \"NY USA\",\n" +
+                "\t\t\"longitude\": -73.94598388671875,\n" +
+                "\t\t\"postId\": 898289598352990208,\n" +
+                "\t\t\"postToFacebook\": 0,\n" +
+                "\t\t\"postToTwitter\": 0,\n" +
+                "\t\t\"promoted\": 0,\n" +
+                "\t\t\"tags\": null,\n" +
+                "\t\t\"thumbnailUrl\": \"http://vines.s3.amazonaws.com/thumbs/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4.jpg\",\n" +
+                "\t\t\"userId\": 108,\n" +
+                "\t\t\"username\": \"Bobby McKenna\",\n" +
+                "\t\t\"videoLowURL\": null,\n" +
+                "\t\t\"videoUrl\": \"http://vines.s3.amazonaws.com/videos/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4\"\n" +
+                "\t}, \n" +
+                "\t{\n" +
+                "\t\t\"avatarUrl\": \"http://vines.s3.amazonaws.com/avatars/FC220C82-1370-4340-887C-01254FBAFB7D-4274-000002E4D4C0B0D4.jpg\",\n" +
+                "\t\t\"comments\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/D6360E08-0BF5-4750-A883-9F9F09F91E06-25016-0000191A7355BDF7.jpg\",\n" +
+                "\t\t\t\t\"comment\": \"When pizza's on a bagel you can eat pizza anytime!\",\n" +
+                "\t\t\t\t\"commentId\": 898291497017937920,\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:19:56.000000\",\n" +
+                "\t\t\t\t\"location\": \"Brooklyn, NY\",\n" +
+                "\t\t\t\t\"userId\": 110,\n" +
+                "\t\t\t\t\"username\": \"Kristian Bauer\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"created\": \"2013-01-02T16:12:23.000000\",\n" +
+                "\t\t\"description\": \"Pizza??? For breakfast?!?!\",\n" +
+                "\t\t\"foursquareVenueId\": null,\n" +
+                "\t\t\"latitude\": 40.70322799682617,\n" +
+                "\t\t\"liked\": false,\n" +
+                "\t\t\"likes\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/1194B685-5366-40A9-B36A-A3403AA35716-2999-000000D804A9A9AA.jpg\",\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:26:28.000000\",\n" +
+                "\t\t\t\t\"likeId\": 898293141113806848,\n" +
+                "\t\t\t\t\"location\": \"NYC\",\n" +
+                "\t\t\t\t\"userId\": 5,\n" +
+                "\t\t\t\t\"username\": \"Dom Hofmann\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"location\": \"NY USA\",\n" +
+                "\t\t\"longitude\": -73.94598388671875,\n" +
+                "\t\t\"postId\": 898289598352990208,\n" +
+                "\t\t\"postToFacebook\": 0,\n" +
+                "\t\t\"postToTwitter\": 0,\n" +
+                "\t\t\"promoted\": 0,\n" +
+                "\t\t\"tags\": null,\n" +
+                "\t\t\"thumbnailUrl\": \"http://vines.s3.amazonaws.com/thumbs/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4.jpg\",\n" +
+                "\t\t\"userId\": 108,\n" +
+                "\t\t\"username\": \"Bobby McKenna\",\n" +
+                "\t\t\"videoLowURL\": null,\n" +
+                "\t\t\"videoUrl\": \"http://vines.s3.amazonaws.com/videos/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4\"\n" +
+                "\t},\n" +
+                "\t{\n" +
+                "\t\t\"avatarUrl\": \"http://vines.s3.amazonaws.com/avatars/FC220C82-1370-4340-887C-01254FBAFB7D-4274-000002E4D4C0B0D4.jpg\",\n" +
+                "\t\t\"comments\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/D6360E08-0BF5-4750-A883-9F9F09F91E06-25016-0000191A7355BDF7.jpg\",\n" +
+                "\t\t\t\t\"comment\": \"When pizza's on a bagel you can eat pizza anytime!\",\n" +
+                "\t\t\t\t\"commentId\": 898291497017937920,\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:19:56.000000\",\n" +
+                "\t\t\t\t\"location\": \"Brooklyn, NY\",\n" +
+                "\t\t\t\t\"userId\": 110,\n" +
+                "\t\t\t\t\"username\": \"Kristian Bauer\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"created\": \"2013-01-02T16:12:23.000000\",\n" +
+                "\t\t\"description\": \"Pizza??? For breakfast?!?!\",\n" +
+                "\t\t\"foursquareVenueId\": null,\n" +
+                "\t\t\"latitude\": 40.70322799682617,\n" +
+                "\t\t\"liked\": false,\n" +
+                "\t\t\"likes\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/1194B685-5366-40A9-B36A-A3403AA35716-2999-000000D804A9A9AA.jpg\",\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:26:28.000000\",\n" +
+                "\t\t\t\t\"likeId\": 898293141113806848,\n" +
+                "\t\t\t\t\"location\": \"NYC\",\n" +
+                "\t\t\t\t\"userId\": 5,\n" +
+                "\t\t\t\t\"username\": \"Dom Hofmann\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"location\": \"NY USA\",\n" +
+                "\t\t\"longitude\": -73.94598388671875,\n" +
+                "\t\t\"postId\": 898289598352990208,\n" +
+                "\t\t\"postToFacebook\": 0,\n" +
+                "\t\t\"postToTwitter\": 0,\n" +
+                "\t\t\"promoted\": 0,\n" +
+                "\t\t\"tags\": null,\n" +
+                "\t\t\"thumbnailUrl\": \"http://vines.s3.amazonaws.com/thumbs/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4.jpg\",\n" +
+                "\t\t\"userId\": 108,\n" +
+                "\t\t\"username\": \"Bobby McKenna\",\n" +
+                "\t\t\"videoLowURL\": null,\n" +
+                "\t\t\"videoUrl\": \"http://vines.s3.amazonaws.com/videos/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4\"\n" +
+                "\t}, \n" +
+                "\t{\n" +
+                "\t\t\"avatarUrl\": \"http://vines.s3.amazonaws.com/avatars/FC220C82-1370-4340-887C-01254FBAFB7D-4274-000002E4D4C0B0D4.jpg\",\n" +
+                "\t\t\"comments\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/D6360E08-0BF5-4750-A883-9F9F09F91E06-25016-0000191A7355BDF7.jpg\",\n" +
+                "\t\t\t\t\"comment\": \"When pizza's on a bagel you can eat pizza anytime!\",\n" +
+                "\t\t\t\t\"commentId\": 898291497017937920,\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:19:56.000000\",\n" +
+                "\t\t\t\t\"location\": \"Brooklyn, NY\",\n" +
+                "\t\t\t\t\"userId\": 110,\n" +
+                "\t\t\t\t\"username\": \"Kristian Bauer\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"created\": \"2013-01-02T16:12:23.000000\",\n" +
+                "\t\t\"description\": \"Pizza??? For breakfast?!?!\",\n" +
+                "\t\t\"foursquareVenueId\": null,\n" +
+                "\t\t\"latitude\": 40.70322799682617,\n" +
+                "\t\t\"liked\": false,\n" +
+                "\t\t\"likes\": {\n" +
+                "\t\t\t\"count\": 1,\n" +
+                "\t\t\t\"nextPage\": null,\n" +
+                "\t\t\t\"previousPage\": null,\n" +
+                "\t\t\t\"records\": [{\n" +
+                "\t\t\t\t\"avatarUrl\": \"https://vines.s3.amazonaws.com/avatars/1194B685-5366-40A9-B36A-A3403AA35716-2999-000000D804A9A9AA.jpg\",\n" +
+                "\t\t\t\t\"created\": \"2013-01-02T16:26:28.000000\",\n" +
+                "\t\t\t\t\"likeId\": 898293141113806848,\n" +
+                "\t\t\t\t\"location\": \"NYC\",\n" +
+                "\t\t\t\t\"userId\": 5,\n" +
+                "\t\t\t\t\"username\": \"Dom Hofmann\"\n" +
+                "\t\t\t}],\n" +
+                "\t\t\t\"size\": 10\n" +
+                "\t\t},\n" +
+                "\t\t\"location\": \"NY USA\",\n" +
+                "\t\t\"longitude\": -73.94598388671875,\n" +
+                "\t\t\"postId\": 898289598352990208,\n" +
+                "\t\t\"postToFacebook\": 0,\n" +
+                "\t\t\"postToTwitter\": 0,\n" +
+                "\t\t\"promoted\": 0,\n" +
+                "\t\t\"tags\": null,\n" +
+                "\t\t\"thumbnailUrl\": \"http://vines.s3.amazonaws.com/thumbs/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4.jpg\",\n" +
+                "\t\t\"userId\": 108,\n" +
+                "\t\t\"username\": \"Bobby McKenna\",\n" +
+                "\t\t\"videoLowURL\": null,\n" +
+                "\t\t\"videoUrl\": \"http://vines.s3.amazonaws.com/videos/04DAF1DE-189D-4A14-829B-84932099763E-3016-000001F8531FB4AA_0.9.1.mp4\"\n" +
+                "\t}],\n" +
+                "\t\"size\": 5\n" +
+                "}";
         private List<Record> records = new ArrayList<>();
         private MainActivity parent;
         private VinoIntf srv;
@@ -193,13 +443,15 @@ public class MainActivity extends AppCompatActivity {
             vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
-                    int pos = adapter.getSelectedItem();
-                    if (pos > -1)
-                        if (pos < adapter.getCount() - 1) {
-                            startVideo(pos + 1);
-                        } else {
-                            stopVideo();
-                        }
+                    startNextVideo();
+                }
+            });
+            vv.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                    Log.d(TAG, "onError");
+                    startNextVideo();
+                    return true;
                 }
             });
             l = (ListView) rootView.findViewById(R.id.listView);
@@ -210,19 +462,29 @@ public class MainActivity extends AppCompatActivity {
             l.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    if (!vv.isPlaying()) {
-                        startVideo(i);
-                    } else {
-                        if (adapter.getSelectedItem() != i) {
-                            stopVideo();
+                    if (adapter.getSelectedItem() != i) {
+                        if (!vv.isPlaying()) {
                             startVideo(i);
                         } else {
                             stopVideo();
+                            startVideo(i);
                         }
+                    } else {
+                        stopVideo();
                     }
                 }
             });
             return rootView;
+        }
+
+        private void startNextVideo() {
+            int pos = adapter.getSelectedItem();
+            if (pos > -1)
+                if (pos < adapter.getCount() - 1) {
+                    startVideo(pos + 1);
+                } else {
+                    stopVideo();
+                }
         }
 
         private void loadRecords(final String tag, final int page) {
@@ -235,32 +497,20 @@ public class MainActivity extends AppCompatActivity {
                             com.example.user.lifeslicetest.Response resp = response.body();
                             if (resp != null) {
                                 Records data = resp.getData();
-                                int n = 0;
-                                if (data != null) {
-                                    Log.d(TAG, "Got records: " + data.getSize());
-                                    Log.d(TAG, "Overall count: " + data.getCount());
-                                    Log.d(TAG, "Next page: " + data.getNextPage());
-                                    Record[] dataRecords = data.getRecords();
-                                    if (dataRecords != null) {
-                                        for (Record r : dataRecords) {
-                                            if (addRecord(r)) {
-                                                adapter.notifyDataSetChanged();
-                                                n++;
-                                            }
-                                        }
-                                        Log.d(TAG, "Added records: " + n);
-                                        Log.d(TAG, "Overall number of records: " + records.size());
-                                    }
-                                    int nextPage = page + 1;
-                                    if (data.getNextPage() != null) loadRecords(tag, nextPage);
-                                } else {
-                                    Log.d(TAG, "No records received");
-                                }
+                                loadData(data, page, tag, false);
                             } else {
-                                String msg = "No data received !";
+                                String msg = "No data received used fake response!";
                                 Log.e(TAG, msg);
-                                if (parent != null) {
-                                    Toast.makeText(parent, msg, Toast.LENGTH_LONG).show();
+                                Gson gson = new Gson();
+                                Records data = gson.fromJson(FAKE_JSON, Records.class);
+                                if (data != null) {
+                                    loadData(data, page, tag, true);
+                                } else {
+                                    msg = "No data found!";
+                                    Log.e(TAG, msg);
+                                    if (parent != null) {
+                                        Toast.makeText(parent, msg, Toast.LENGTH_LONG).show();
+                                    }
                                 }
                             }
                         }
@@ -279,11 +529,37 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private boolean addRecord(Record r) {
-            for (Record r1 : records) {
-                if (r1.getVideoUrl() != null && r1.getVideoUrl().equals(r.getVideoUrl())) {
-                    Log.e(TAG, "found duplicate record: " + r.getVideoUrl());
-                    return false;
+        private void loadData(Records data, int page, String tag, boolean isFake) {
+            int n = 0;
+            if (data != null) {
+                Log.d(TAG, "Got records: " + data.getSize());
+                Log.d(TAG, "Overall count: " + data.getCount());
+                Log.d(TAG, "Next page: " + data.getNextPage());
+                Record[] dataRecords = data.getRecords();
+                if (dataRecords != null) {
+                    for (Record r : dataRecords) {
+                        if (addRecord(r, isFake)) {
+                            adapter.notifyDataSetChanged();
+                            n++;
+                        }
+                    }
+                    Log.d(TAG, "Added records: " + n);
+                    Log.d(TAG, "Overall number of records: " + records.size());
+                }
+                int nextPage = page + 1;
+                if (data.getNextPage() != null) loadRecords(tag, nextPage);
+            } else {
+                Log.d(TAG, "No records received");
+            }
+        }
+
+        private boolean addRecord(Record r, boolean isFake) {
+            if (!isFake) {
+                for (Record r1 : records) {
+                    if (r1.getVideoUrl() != null && r1.getVideoUrl().equals(r.getVideoUrl())) {
+                        Log.e(TAG, "found duplicate record: " + r.getVideoUrl());
+                        return false;
+                    }
                 }
             }
             records.add(r);
