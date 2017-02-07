@@ -11,8 +11,8 @@ import retrofit2.http.Query;
 
 public interface VinoIntf {
 
-    public static final String SERVER_URL = "https://api.vineapp.com/";
+    public static final String SERVER_URL = "https://api.lifeslice.io/";
 
     @GET("timelines/tags/{tag}")
-    Call<Response> getForTag(@Path("tag") String tag, @Query("page") int page);
+    Call<Records> getForTag(@Path("tag") String tag, @Query("page") int page);
 }

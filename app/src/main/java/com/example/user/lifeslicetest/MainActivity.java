@@ -491,13 +491,13 @@ public class MainActivity extends AppCompatActivity {
             if (tag != null && tag.trim().length() > 0) {
                 if (!parent.stopLoading) {
                     if (page == 0) records.clear();
-                    Callback<com.example.user.lifeslicetest.Response> callback = new Callback<com.example.user.lifeslicetest.Response>() {
+                    Callback<com.example.user.lifeslicetest.Records> callback = new Callback<com.example.user.lifeslicetest.Records>() {
                         @Override
-                        public void onResponse(Call<com.example.user.lifeslicetest.Response> call, Response<com.example.user.lifeslicetest.Response> response) {
-                            com.example.user.lifeslicetest.Response resp = response.body();
+                        public void onResponse(Call<com.example.user.lifeslicetest.Records> call, Response<com.example.user.lifeslicetest.Records> response) {
+                            com.example.user.lifeslicetest.Records resp = response.body();
                             if (resp != null) {
-                                Records data = resp.getData();
-                                loadData(data, page, tag, false);
+                                Records data = resp;
+                                loadData(data, page, tag, true);
                             } else {
                                 String msg = "No data received used fake response!";
                                 Log.e(TAG, msg);
@@ -516,7 +516,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFailure(Call<com.example.user.lifeslicetest.Response> call, Throwable t) {
+                        public void onFailure(Call<com.example.user.lifeslicetest.Records> call, Throwable t) {
                             Log.e(TAG, "Load videos failed: " + t.getLocalizedMessage());
                         }
                     };
@@ -566,7 +566,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        private void getForTag(String tag, int page, Callback<com.example.user.lifeslicetest.Response> callback) {
+        private void getForTag(String tag, int page, Callback<com.example.user.lifeslicetest.Records> callback) {
             srv.getForTag(tag, page).enqueue(callback);
         }
 
